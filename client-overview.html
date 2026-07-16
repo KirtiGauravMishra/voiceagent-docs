@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoiceAgent — Platform Overview</title>
+<style>
+  :root{
+    --bg:#F6F7FB;
+    --surface:#FFFFFF;
+    --surface-alt:#FBFBFE;
+    --ink:#13141C;
+    --ink-soft:#4A4C5A;
+    --muted:#82859A;
+    --border:#E5E7F0;
+    --border-strong:#D2D5E3;
+    --accent:#5B32E0;
+    --accent-2:#7C3AED;
+    --accent-ink:#4526AD;
+    --accent-soft:#EFEBFD;
+    --good:#12875A;
+    --good-soft:#E3F6EC;
+    --warm:#C2570A;
+    --warm-soft:#FBEEE0;
+    --shadow-sm: 0 1px 2px rgba(15,15,30,0.05);
+    --shadow-md: 0 6px 16px -6px rgba(15,15,30,0.10);
+    --shadow-lg: 0 26px 52px -22px rgba(15,15,30,0.20);
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0E0F16; --surface:#171826; --surface-alt:#12131C; --ink:#F3F4F8; --ink-soft:#C6C8D6; --muted:#8B8DA3;
+      --border:#282A3B; --border-strong:#383B52; --accent:#8C6BFF; --accent-2:#A78BFA; --accent-ink:#CBBBFF; --accent-soft:#231B42;
+      --good:#3DD68C; --good-soft:#123425; --warm:#F2984B; --warm-soft:#3A2712;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.4); --shadow-md: 0 8px 20px -8px rgba(0,0,0,0.55); --shadow-lg: 0 30px 60px -22px rgba(0,0,0,0.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E0F16; --surface:#171826; --surface-alt:#12131C; --ink:#F3F4F8; --ink-soft:#C6C8D6; --muted:#8B8DA3;
+    --border:#282A3B; --border-strong:#383B52; --accent:#8C6BFF; --accent-2:#A78BFA; --accent-ink:#CBBBFF; --accent-soft:#231B42;
+    --good:#3DD68C; --good-soft:#123425; --warm:#F2984B; --warm-soft:#3A2712;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.4); --shadow-md: 0 8px 20px -8px rgba(0,0,0,0.55); --shadow-lg: 0 30px 60px -22px rgba(0,0,0,0.7);
+  }
+  :root[data-theme="light"]{
+    --bg:#F6F7FB; --surface:#FFFFFF; --surface-alt:#FBFBFE; --ink:#13141C; --ink-soft:#4A4C5A; --muted:#82859A;
+    --border:#E5E7F0; --border-strong:#D2D5E3; --accent:#5B32E0; --accent-2:#7C3AED; --accent-ink:#4526AD; --accent-soft:#EFEBFD;
+    --good:#12875A; --good-soft:#E3F6EC; --warm:#C2570A; --warm-soft:#FBEEE0;
+    --shadow-sm: 0 1px 2px rgba(15,15,30,0.05); --shadow-md: 0 6px 16px -6px rgba(15,15,30,0.10); --shadow-lg: 0 26px 52px -22px rgba(15,15,30,0.20);
+  }
+
+  *{box-sizing:border-box;}
+  html{background:var(--bg); scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-sans); line-height:1.6; font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent-soft); color:var(--accent-ink); }
+  a{ color:var(--accent-ink); }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+  svg{ display:block; }
+
+  h1,h2,h3,h4{ font-family:var(--font-sans); font-weight:800; margin:0; letter-spacing:-0.02em; text-wrap:balance; color:var(--ink); }
+  p{ margin:0; }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.13em; text-transform:uppercase;
+    color:var(--muted); font-weight:600;
+  }
+
+  #rail{ position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); width:0%; z-index:50;
+    transition:width 120ms linear; }
+  @media (prefers-reduced-motion: reduce){ #rail{ transition:none; } }
+
+  #topbar{
+    position:fixed; top:3px; left:0; right:0; z-index:40;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 32px; background:color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--border);
+  }
+  .topbar-left{ display:flex; align-items:center; gap:20px; }
+  .wordmark{ font-family:var(--font-sans); font-weight:800; font-size:1.02rem; letter-spacing:-0.01em; display:flex; align-items:center; gap:8px; color:var(--ink); text-decoration:none;}
+  .wordmark .mark{ width:22px; height:22px; border-radius:7px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); flex:0 0 auto; }
+  .back-link{ font-size:0.8rem; color:var(--muted); text-decoration:none; border-left:1px solid var(--border); padding-left:20px; font-weight:500; }
+  .back-link:hover{ color:var(--accent-ink); }
+  #topbar .section-label{ font-family:var(--font-mono); font-size:0.72rem; color:var(--muted); letter-spacing:0.07em; text-transform:uppercase; }
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+  .topbar-nav{ display:flex; align-items:center; gap:16px; }
+  .topbar-nav a{ font-size:0.82rem; font-weight:600; color:var(--ink-soft); text-decoration:none; }
+  .topbar-nav a:hover{ color:var(--accent-ink); }
+  #pdf-btn{
+    font-family:var(--font-sans); font-size:0.82rem; font-weight:700; color:#fff; background:var(--accent);
+    border:none; padding:9px 16px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:7px;
+    box-shadow:var(--shadow-sm);
+  }
+  #pdf-btn:hover{ filter:brightness(1.1); }
+  #pdf-btn svg{ width:14px; height:14px; }
+
+  .wrap{ max-width:1000px; margin:0 auto; padding:0 32px; }
+
+  .page{ padding:136px 0 100px; border-bottom:1px solid var(--border); position:relative; scroll-margin-top:70px; }
+  .page:last-of-type{ border-bottom:none; }
+  .page-foot{
+    max-width:1000px; margin:64px auto 0; padding:0 32px;
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:var(--font-mono); font-size:0.72rem; color:var(--muted); letter-spacing:0.06em;
+  }
+
+  .reveal{ opacity:0; transform:translateY(14px); transition:opacity 560ms ease, transform 560ms ease; }
+  .reveal.visible{ opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce){ .reveal{ transition:none; opacity:1; transform:none; } }
+
+  /* ---- Cover ---- */
+  .cover{ padding-top:152px; }
+  .cover .eyebrow{ margin-bottom:20px; }
+  .cover h1{ font-size:clamp(2.3rem,5.2vw,3.5rem); line-height:1.08; max-width:17ch; }
+  .cover .sub{ font-size:1.15rem; color:var(--ink-soft); max-width:48ch; margin-top:20px; font-weight:400; }
+  .cover .lede-row{ display:flex; gap:56px; margin-top:52px; align-items:flex-start; flex-wrap:wrap; }
+  .cover .lede-copy{ flex:1 1 340px; }
+  .toc{ flex:0 0 270px; border:1px solid var(--border); border-radius:12px; padding:22px 24px; background:var(--surface); box-shadow:var(--shadow-sm); }
+  .toc-item{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--border); font-size:0.88rem; font-weight:600; }
+  .toc-item:last-child{ border-bottom:none; }
+  .toc-item .num{ font-family:var(--font-mono); color:var(--muted); font-size:0.76rem; font-weight:500; }
+
+  .call-card{
+    margin-top:52px; max-width:430px; border-radius:14px; background:var(--surface);
+    border:1px solid var(--border); box-shadow:var(--shadow-lg); overflow:hidden;
+  }
+  .call-card-top{ display:flex; align-items:center; justify-content:space-between; padding:15px 20px; border-bottom:1px solid var(--border); background:var(--surface-alt); }
+  .call-live{ display:flex; align-items:center; gap:8px; font-size:0.78rem; color:var(--good); font-weight:700; }
+  .live-dot{ width:8px; height:8px; border-radius:50%; background:var(--good); animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+  @media (prefers-reduced-motion: reduce){ .live-dot{ animation:none; } }
+  .call-timer{ font-family:var(--font-mono); font-size:0.8rem; color:var(--muted); font-weight:600; }
+  .call-card-body{ padding:20px 20px 22px; }
+  .call-who-row{ display:flex; align-items:center; gap:12px; }
+  .avatar{ width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.85rem; flex:0 0 auto; }
+  .call-who{ font-size:1.02rem; font-weight:700; }
+  .call-with{ font-size:0.82rem; color:var(--muted); margin-top:1px; }
+  .wave{ display:flex; align-items:flex-end; gap:3px; height:40px; margin:18px 0 2px; }
+  .wave span{ width:4px; background:var(--accent); border-radius:2px; opacity:0.9; }
+
+  /* ---- Section heads ---- */
+  .section-head{ display:flex; align-items:baseline; gap:18px; margin-bottom:12px; }
+  .section-num{ font-family:var(--font-mono); font-size:0.85rem; color:var(--muted); font-weight:600; }
+  h2.page-title{ font-size:clamp(1.7rem,3vw,2.35rem); }
+  .page-intro{ margin-top:14px; max-width:62ch; color:var(--ink-soft); font-size:1.05rem; }
+
+  /* ---- Feature blocks ---- */
+  .feature{ margin-top:68px; }
+  .feature:first-of-type{ margin-top:52px; }
+  .feature-head{ display:flex; gap:16px; align-items:flex-start; }
+  .feature-icon{ width:46px; height:46px; border-radius:11px; background:var(--accent-soft); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .feature-icon svg{ width:22px; height:22px; }
+  .feature-body{ flex:1; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+  .feature-title{ font-size:1.32rem; max-width:22ch; }
+  .feature-copy{ margin-top:8px; max-width:58ch; color:var(--ink-soft); font-weight:400; }
+  .feature-tag{ font-family:var(--font-mono); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em;
+    color:var(--accent-ink); background:var(--accent-soft); padding:5px 10px; border-radius:100px; white-space:nowrap; height:fit-content; }
+
+  .frame{ margin-top:24px; margin-left:62px; border-radius:12px; border:1px solid var(--border); background:var(--surface);
+    box-shadow:var(--shadow-md); overflow:hidden; position:relative; }
+  .frame::before{ content:""; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); }
+  .frame-bar{ display:flex; align-items:center; justify-content:space-between; gap:6px; padding:11px 16px; border-bottom:1px solid var(--border); background:var(--surface-alt); }
+  .frame-bar .fb-path{ font-family:var(--font-mono); font-size:0.72rem; color:var(--muted); display:flex; align-items:center; gap:6px; }
+  .frame-bar .fb-dot{ width:6px; height:6px; border-radius:50%; background:var(--good); }
+  .frame-body{ padding:22px; overflow-x:auto; background:var(--surface-alt); }
+
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:100px; font-size:0.72rem; font-weight:700; }
+  .pill.good{ background:var(--good-soft); color:var(--good); }
+  .pill.warm{ background:var(--warm-soft); color:var(--warm); }
+  .pill.muted{ background:var(--border); color:var(--ink-soft); }
+  .pill .dot{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+  /* Agents mockup */
+  .agent-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; min-width:600px; }
+  .agent-card{ border:1px solid var(--border); border-radius:10px; padding:15px; background:var(--surface); }
+  .agent-top{ display:flex; align-items:center; gap:10px; }
+  .agent-avatar{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:0.78rem; flex:0 0 auto; }
+  .agent-name{ font-weight:700; font-size:0.9rem; }
+  .agent-role{ font-size:0.72rem; color:var(--muted); }
+  .agent-desc{ font-size:0.79rem; color:var(--ink-soft); margin-top:10px; line-height:1.5; }
+  .agent-actions{ display:flex; gap:8px; margin-top:14px; align-items:center; }
+  .mini-btn{ font-size:0.72rem; padding:5px 10px; border-radius:6px; border:1px solid var(--border-strong); color:var(--ink-soft); font-weight:600; }
+  .mini-btn.primary{ background:var(--accent); color:#fff; border-color:transparent; }
+
+  /* Calls mockup */
+  .calls-split{ display:grid; grid-template-columns:1fr 1.3fr; gap:0; min-width:640px; }
+  .calls-list{ border-right:1px solid var(--border); }
+  .call-row{ padding:12px 16px; border-bottom:1px solid var(--border); font-size:0.82rem; }
+  .call-row.active{ background:var(--accent-soft); }
+  .call-row-top{ display:flex; justify-content:space-between; font-weight:700; }
+  .call-row-sub{ color:var(--muted); font-size:0.73rem; margin-top:3px; }
+  .transcript{ padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .bubble{ max-width:80%; padding:9px 13px; border-radius:12px; font-size:0.82rem; line-height:1.5; }
+  .bubble.agent{ background:var(--surface); border:1px solid var(--border); color:var(--ink); border-bottom-left-radius:3px; align-self:flex-start; }
+  .bubble.caller{ background:var(--accent); color:#fff; border-bottom-right-radius:3px; align-self:flex-end; }
+
+  /* Campaign mockup */
+  .campaign-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; min-width:600px; }
+  .campaign-card{ border:1px solid var(--border); border-radius:10px; padding:16px; background:var(--surface); }
+  .campaign-top{ display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:0.9rem; }
+  .progress-track{ height:7px; border-radius:100px; background:var(--border); margin:14px 0 12px; overflow:hidden; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); border-radius:100px; }
+  .stat-row{ display:flex; justify-content:space-between; font-size:0.71rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .stat-row b{ color:var(--ink); font-size:0.86rem; display:block; font-family:var(--font-mono); }
+
+  /* Kanban mockup */
+  .kanban{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; min-width:660px; }
+  .kanban-col-head{ font-size:0.71rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:10px; display:flex; justify-content:space-between; font-weight:700; }
+  .kanban-col-head span:last-child{ background:var(--border); color:var(--ink-soft); border-radius:100px; padding:1px 7px; font-family:var(--font-mono); }
+  .kanban-card{ border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:10px 12px; margin-bottom:8px; font-size:0.78rem; }
+  .kanban-card .kname{ font-weight:700; }
+  .kanban-card .kval{ color:var(--muted); margin-top:4px; font-family:var(--font-mono); font-size:0.72rem; }
+
+  /* Workflow mockup */
+  .flow-chain{ display:flex; align-items:center; min-width:640px; }
+  .flow-node{ border:1px solid var(--border); background:var(--surface); border-radius:10px; padding:12px 15px; min-width:160px; display:flex; align-items:center; gap:10px; }
+  .flow-node .fn-icon{ width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; color:#fff; }
+  .flow-node .fn-icon svg{ width:16px; height:16px; }
+  .flow-node .fn-type{ font-family:var(--font-mono); font-size:0.63rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); font-weight:600; }
+  .flow-node .fn-label{ font-weight:700; font-size:0.83rem; margin-top:2px; }
+  .flow-connector{ flex:0 0 40px; height:2px; background:var(--border-strong); position:relative; }
+  .flow-connector::after{ content:""; position:absolute; right:0; top:50%; transform:translateY(-50%); border-style:solid;
+    border-width:5px 0 5px 7px; border-color:transparent transparent transparent var(--border-strong); }
+
+  /* KB mockup */
+  .kb-list{ min-width:560px; display:flex; flex-direction:column; gap:2px; }
+  .kb-row{ display:flex; justify-content:space-between; align-items:center; padding:11px 4px; border-bottom:1px solid var(--border); font-size:0.85rem; }
+  .kb-row:last-child{ border-bottom:none; }
+  .kb-name{ display:flex; align-items:center; gap:11px; font-weight:600; }
+  .kb-icon{ width:28px; height:28px; border-radius:7px; background:var(--accent-soft); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:0.62rem; font-weight:800; }
+
+  /* Voices mockup */
+  .voice-list{ min-width:560px; display:flex; flex-direction:column; gap:10px; }
+  .voice-row{ display:flex; align-items:center; gap:14px; padding:11px 14px; border:1px solid var(--border); border-radius:10px; }
+  .voice-row.selected{ border-color:var(--accent); background:var(--accent-soft); }
+  .play-btn{ width:32px; height:32px; border-radius:50%; background:var(--surface); border:1px solid var(--border-strong); flex:0 0 32px;
+    display:flex; align-items:center; justify-content:center; color:var(--ink-soft); }
+  .voice-row.selected .play-btn{ color:var(--accent-ink); border-color:var(--accent); }
+  .play-btn svg{ width:13px; height:13px; margin-left:2px; }
+  .voice-name{ font-weight:700; font-size:0.88rem; }
+  .voice-meta{ font-size:0.75rem; color:var(--muted); }
+  .voice-check{ margin-left:auto; color:var(--accent-ink); display:flex; }
+  .voice-check svg{ width:18px; height:18px; }
+
+  /* Dashboard mockup */
+  .kpi-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; min-width:640px; }
+  .kpi-tile{ border:1px solid var(--border); border-radius:10px; padding:14px; background:var(--surface); }
+  .kpi-top{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .kpi-num{ font-family:var(--font-mono); font-size:1.32rem; font-weight:800; font-variant-numeric:tabular-nums; }
+  .kpi-trend{ font-size:0.68rem; font-weight:700; color:var(--good); background:var(--good-soft); padding:2px 6px; border-radius:6px; }
+  .kpi-label{ font-size:0.72rem; color:var(--muted); margin-top:4px; font-weight:600; }
+  .chart-row{ display:grid; grid-template-columns:1.6fr 1fr; gap:20px; margin-top:16px; min-width:640px; }
+  .chart-card{ border:1px solid var(--border); border-radius:10px; padding:16px; background:var(--surface); }
+  .chart-title{ font-size:0.74rem; font-weight:700; color:var(--ink-soft); margin-bottom:14px; }
+  .bars{ display:flex; align-items:flex-end; gap:8px; height:110px; }
+  .bars .bar{ flex:1; background:var(--accent); border-radius:4px 4px 0 0; opacity:0.9; }
+  .bar-labels{ display:flex; gap:8px; margin-top:8px; }
+  .bar-labels span{ flex:1; text-align:center; font-size:0.66rem; color:var(--muted); font-weight:600; }
+  .donut{ width:112px; height:112px; border-radius:50%; margin:0 auto;
+    background:conic-gradient(var(--good) 0 92%, var(--accent) 92% 96%, var(--warm) 96% 100%);
+    display:flex; align-items:center; justify-content:center; }
+  .donut-hole{ width:66px; height:66px; border-radius:50%; background:var(--surface); display:flex; align-items:center; justify-content:center;
+    flex-direction:column; }
+  .donut-hole b{ font-family:var(--font-mono); font-size:0.98rem; }
+  .donut-hole span{ font-size:0.6rem; color:var(--muted); }
+  .legend{ display:flex; flex-direction:column; gap:6px; margin-top:14px; font-size:0.7rem; }
+  .legend-item{ display:flex; align-items:center; gap:6px; color:var(--ink-soft); font-weight:600; }
+  .legend-swatch{ width:8px; height:8px; border-radius:2px; }
+
+  /* ---- How It Works flow storyboard (page 2) ---- */
+  .storyboard{ display:flex; margin-top:44px; overflow-x:auto; padding-bottom:10px; gap:0; }
+  .story-step{ flex:0 0 208px; padding:0 6px; }
+  .story-card{ border:1px solid var(--border); background:var(--surface); border-radius:14px; padding:20px 18px; box-shadow:var(--shadow-sm); height:100%; }
+  .story-icon{ width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center; color:#fff; margin-bottom:14px; }
+  .story-icon svg{ width:21px; height:21px; }
+  .story-num{ font-family:var(--font-mono); font-size:0.66rem; color:var(--muted); font-weight:700; letter-spacing:0.05em; }
+  .story-title{ font-weight:800; font-size:0.98rem; margin-top:4px; }
+  .story-copy{ font-size:0.78rem; color:var(--ink-soft); margin-top:8px; line-height:1.5; }
+  .story-chip{ margin-top:16px; border:1px solid var(--border); background:var(--surface-alt); border-radius:8px; padding:9px 11px; font-size:0.72rem; }
+  .story-chip .sc-top{ font-weight:700; display:flex; justify-content:space-between; align-items:center; }
+  .story-chip .sc-sub{ color:var(--muted); margin-top:3px; font-size:0.68rem; }
+  .story-arrow{ flex:0 0 34px; display:flex; align-items:center; justify-content:center; color:var(--border-strong); align-self:center; margin-top:60px; }
+  .story-arrow svg{ width:20px; height:20px; }
+
+  .narrative{ margin-top:48px; border:1px solid var(--border); background:var(--surface); border-radius:14px; padding:28px 32px; box-shadow:var(--shadow-sm); }
+  .narrative .eyebrow{ margin-bottom:10px; }
+  .narrative p{ color:var(--ink-soft); font-size:1rem; max-width:76ch; }
+  .narrative b{ color:var(--ink); }
+
+  .pull{ margin-top:36px; padding-left:22px; border-left:3px solid var(--accent); font-size:1.18rem; font-weight:600; color:var(--ink); max-width:54ch; letter-spacing:-0.01em; }
+
+  .closing-cta{ margin-top:60px; border:1px solid var(--border); background:var(--surface); border-radius:16px; padding:38px 42px; box-shadow:var(--shadow-lg); position:relative; overflow:hidden; }
+  .closing-cta::before{ content:""; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); }
+  .closing-cta h3{ font-size:1.5rem; }
+  .closing-cta p{ margin-top:12px; color:var(--ink-soft); max-width:56ch; }
+  .benefit-list{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:26px; }
+  .benefit{ font-size:0.9rem; border-left:2px solid var(--border); padding-left:14px; }
+  .benefit b{ display:block; font-size:1.5rem; font-family:var(--font-mono); color:var(--accent-ink); }
+  .benefit span{ color:var(--muted); font-size:0.8rem; font-weight:500; }
+  .cta-btn{
+    margin-top:30px; display:inline-flex; align-items:center; gap:9px; font-family:var(--font-sans); font-weight:700;
+    font-size:0.94rem; color:#fff; background:var(--accent); padding:12px 22px; border-radius:10px; text-decoration:none;
+    box-shadow:var(--shadow-md);
+  }
+  .cta-btn:hover{ filter:brightness(1.08); }
+  .cta-btn svg{ width:16px; height:16px; }
+
+  /* ---- Build timeline table ---- */
+  .dl-table{ width:100%; border-collapse:collapse; margin-top:32px; font-size:0.87rem; }
+  .dl-table th{ text-align:left; padding:11px 14px; border-bottom:2px solid var(--border-strong); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:700; }
+  .dl-table td{ padding:13px 14px; border-bottom:1px solid var(--border); }
+  .dl-table tr:last-child td{ border-bottom:none; }
+  .dl-table td.phase{ font-weight:600; }
+  .dl-table td.num{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink-soft); }
+  .dl-table tr.total td{ font-weight:800; color:var(--ink); border-top:2px solid var(--border-strong); padding-top:16px; }
+  .dl-table tr.total td.num{ color:var(--accent-ink); font-size:1.02rem; }
+
+  .agent-badge{
+    display:inline-flex; align-items:center; gap:9px; margin-top:18px; padding:10px 18px; border-radius:100px;
+    background:linear-gradient(135deg,var(--accent-soft),var(--good-soft)); border:1px solid var(--accent);
+    font-size:0.85rem; font-weight:700; color:var(--ink);
+  }
+  .agent-badge svg{ width:17px; height:17px; color:var(--accent-ink); flex:0 0 auto; }
+  .agent-badge b{ color:var(--accent-ink); }
+  .table-note{ font-size:0.75rem; color:var(--muted); margin-top:10px; font-style:italic; }
+
+  /* ---- Cost comparison cards ---- */
+  .cost-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:24px; }
+  .cost-card{ border:1px solid var(--border); background:var(--surface); border-radius:14px; padding:24px 26px; box-shadow:var(--shadow-sm); }
+  .cost-card h4{ font-size:1.02rem; font-weight:700; letter-spacing:-0.01em; }
+  .cost-card .cc-sub{ font-size:0.76rem; color:var(--muted); margin-top:4px; }
+  .cost-line{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--border); font-size:0.82rem; }
+  .cost-line:first-of-type{ margin-top:16px; }
+  .cost-line .cl-label{ color:var(--ink-soft); }
+  .cost-line .cl-val{ font-family:var(--font-mono); font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .cost-total-row{ display:flex; justify-content:space-between; align-items:baseline; margin-top:16px; padding-top:16px; border-top:2px solid var(--border-strong); }
+  .cost-total-row .ct-label{ font-weight:700; font-size:0.88rem; }
+  .cost-total-row .ct-val{ font-family:var(--font-mono); font-weight:800; font-size:1.35rem; color:var(--accent-ink); }
+  .cost-per-call{ font-size:0.74rem; color:var(--muted); margin-top:6px; text-align:right; }
+
+  .compare-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:28px; }
+  .compare-row.four{ grid-template-columns:repeat(4,1fr); }
+  .compare-tile{ border:1px solid var(--border); border-radius:12px; padding:20px; text-align:center; background:var(--surface); }
+  .compare-tile.best{ border-color:var(--good); background:var(--good-soft); }
+  .compare-tile .ct-name{ font-size:0.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+  .compare-tile.best .ct-name{ color:var(--good); }
+  .compare-tile .ct-price{ font-family:var(--font-mono); font-size:1.6rem; font-weight:800; margin-top:8px; }
+  .compare-tile .ct-note{ font-size:0.72rem; color:var(--muted); margin-top:4px; }
+
+  .note-box{ margin-top:32px; border:1px dashed var(--border-strong); border-radius:12px; padding:18px 22px; font-size:0.8rem; color:var(--ink-soft); background:var(--surface-alt); line-height:1.6; }
+  .note-box b{ color:var(--ink); }
+
+  .scale-table{ margin-top:16px; border-top:1px dashed var(--border); padding-top:12px; }
+  .scale-head{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:700; margin-bottom:6px; }
+  .scale-row{ display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 2px; color:var(--ink-soft); border-radius:6px; }
+  .scale-row .sv{ font-family:var(--font-mono); font-weight:600; font-variant-numeric:tabular-nums; }
+  .scale-row.base{ font-weight:700; color:var(--ink); background:var(--accent-soft); margin:2px 0; padding:6px 8px; }
+  .scale-row.base .sv{ color:var(--accent-ink); }
+
+  @media (max-width:720px){
+    .cost-grid{ grid-template-columns:1fr; }
+    .compare-row, .compare-row.four{ grid-template-columns:1fr; }
+    .dl-table{ font-size:0.78rem; }
+  }
+  @media print{
+    .cost-grid, .compare-row{ grid-template-columns:1fr 1fr; }
+    .compare-row.four{ grid-template-columns:repeat(2,1fr); }
+  }
+
+  @media (max-width: 900px){
+    .frame{ margin-left:0; }
+  }
+  @media (max-width: 720px){
+    .lede-row{ flex-direction:column; }
+    .toc{ width:100%; }
+    .benefit-list{ grid-template-columns:1fr; }
+    #topbar .section-label{ display:none; }
+    .topbar-nav{ display:none; }
+    .back-link{ display:none; }
+    .feature-head{ flex-direction:column; }
+    .frame{ margin-left:0; }
+  }
+
+  @media print{
+    @page{ size:A4 landscape; margin:12mm; }
+    #topbar, #rail{ display:none; }
+    .page{ page-break-after:always; padding:16px 0 24px; border-bottom:none; }
+    .reveal{ opacity:1 !important; transform:none !important; }
+    body{ background:#fff; font-size:13px; }
+    .wrap{ max-width:100%; padding:0 6mm; }
+    .frame{ box-shadow:none; margin-left:0 !important; }
+    .frame-body{ overflow-x:visible; }
+    /* Collapse every mockup's scroll-width floor so nothing is clipped off the printed page */
+    .agent-grid, .calls-split, .campaign-grid, .kanban, .flow-chain,
+    .kb-list, .voice-list, .kpi-row, .chart-row{ min-width:0 !important; }
+    .storyboard{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; overflow:visible; padding-bottom:0; }
+    .story-step{ flex:none; padding:0; }
+    .story-arrow{ display:none; }
+    .closing-cta, .narrative{ box-shadow:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="rail"></div>
+<div id="topbar">
+  <div class="topbar-left">
+    <span class="wordmark"><span class="mark"></span>VoiceAgent</span>
+    <a class="back-link" href="index.html">&larr; Back to documentation</a>
+  </div>
+  <div class="topbar-right">
+    <div class="section-label" id="section-label">Platform Overview</div>
+    <div class="topbar-nav">
+      <a href="#deadlines">Timeline</a>
+      <a href="#costing">Costing</a>
+    </div>
+    <button id="pdf-btn" type="button" title="Opens your browser's print dialog — choose &quot;Save as PDF&quot; as the destination">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+      Download PDF
+    </button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- PAGE 1 — COVER -->
+  <section class="page cover">
+    <p class="eyebrow">Platform overview</p>
+    <h1>Every call answered. Every lead followed up. Automatically.</h1>
+    <div class="lede-row">
+      <div class="lede-copy">
+        <p class="sub">VoiceAgent is an AI teammate that picks up the phone, has a real conversation, and takes care of the busywork that follows — so your team spends less time dialing and more time closing.</p>
+        <div class="call-card reveal">
+          <div class="call-card-top">
+            <div class="call-live"><span class="live-dot"></span>Live call</div>
+            <div class="call-timer">02:41</div>
+          </div>
+          <div class="call-card-body">
+            <div class="call-who-row">
+              <div class="avatar">RS</div>
+              <div>
+                <div class="call-who">Riya Sharma</div>
+                <div class="call-with">Speaking with <b>Aria</b> — Sales Agent</div>
+              </div>
+            </div>
+            <div class="wave" aria-hidden="true">
+              <span style="height:30%"></span><span style="height:60%"></span><span style="height:85%"></span>
+              <span style="height:45%"></span><span style="height:70%"></span><span style="height:25%"></span>
+              <span style="height:55%"></span><span style="height:90%"></span><span style="height:40%"></span>
+              <span style="height:65%"></span><span style="height:35%"></span><span style="height:50%"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p class="eyebrow" style="margin-bottom:14px;">In this overview</p>
+        <div class="toc-item"><span>How it works</span><span class="num">02</span></div>
+        <div class="toc-item"><span>Agents &amp; conversations</span><span class="num">03</span></div>
+        <div class="toc-item"><span>Scale &amp; pipeline</span><span class="num">04</span></div>
+        <div class="toc-item"><span>Smarter every call</span><span class="num">05</span></div>
+        <div class="toc-item"><span>Insights &amp; analytics</span><span class="num">06</span></div>
+        <div class="toc-item"><span>Build timeline</span><span class="num">07</span></div>
+        <div class="toc-item"><span>Cost estimate</span><span class="num">08</span></div>
+        <div class="toc-item"><span>Why it matters</span><span class="num">09</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 2 — HOW IT WORKS (full flow) -->
+  <section class="page" data-label="How It Works">
+    <div class="section-head reveal"><span class="section-num">02 / 09</span></div>
+    <h2 class="page-title">From new lead to closed deal — one continuous flow</h2>
+    <p class="page-intro">Nothing here needs to be operated by hand. Once it's set up, a lead can arrive, get called, get logged, get followed up with, and show up on your dashboard — without anyone touching a keyboard.</p>
+
+    <div class="storyboard reveal">
+      <div class="story-step">
+        <div class="story-card">
+          <div class="story-icon" style="background:#2E7D6B;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.6 2.9-6 5.5-6s5.5 2.4 5.5 6"/><path d="M18 8h4M20 6v4"/></svg>
+          </div>
+          <div class="story-num">STEP 1</div>
+          <div class="story-title">A lead comes in</div>
+          <div class="story-copy">From a web form, an import, or a campaign list.</div>
+          <div class="story-chip"><div class="sc-top">Ben Torres <span class="pill muted">New</span></div><div class="sc-sub">$1,200 · Website form</div></div>
+        </div>
+      </div>
+      <div class="story-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="story-step">
+        <div class="story-card">
+          <div class="story-icon" style="background:var(--accent);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path d="M9 21h6"/></svg>
+          </div>
+          <div class="story-num">STEP 2</div>
+          <div class="story-title">An agent takes it</div>
+          <div class="story-copy">The right voice, script, and rules — assigned automatically.</div>
+          <div class="story-chip"><div class="sc-top">Aria <span class="pill good"><span class="dot"></span>Active</span></div><div class="sc-sub">Sales agent</div></div>
+        </div>
+      </div>
+      <div class="story-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="story-step">
+        <div class="story-card">
+          <div class="story-icon" style="background:#B5460B;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.4 21 3 13.6 3 4.6c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8Z"/></svg>
+          </div>
+          <div class="story-num">STEP 3</div>
+          <div class="story-title">The call happens</div>
+          <div class="story-copy">A natural, live conversation — transcribed as it happens.</div>
+          <div class="story-chip"><div class="sc-top">Live <span class="pill good"><span class="dot"></span>02:41</span></div><div class="sc-sub">Outbound · Aria</div></div>
+        </div>
+      </div>
+      <div class="story-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="story-step">
+        <div class="story-card">
+          <div class="story-icon" style="background:#0E7C86;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/><path d="M8 15l2 2 4-4"/></svg>
+          </div>
+          <div class="story-num">STEP 4</div>
+          <div class="story-title">Books the appointment</div>
+          <div class="story-copy">If Ben's ready, Aria books it straight into your calendar — live on the call.</div>
+          <div class="story-chip"><div class="sc-top">Appointment <span class="pill good">Booked</span></div><div class="sc-sub">By Aria · Fri, 3:00 PM</div></div>
+        </div>
+      </div>
+      <div class="story-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="story-step">
+        <div class="story-card">
+          <div class="story-icon" style="background:#A8324A;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.6 2.9-6 5.5-6"/><path d="M13.5 15l2.5 2.5L21 12"/></svg>
+          </div>
+          <div class="story-num">STEP 5</div>
+          <div class="story-title">Hands off to a human</div>
+          <div class="story-copy">Urgent, or Ben asks for a person? The call transfers immediately — mid-conversation.</div>
+          <div class="story-chip"><div class="sc-top">Transfer <span class="pill warm">Live</span></div><div class="sc-sub">To: Support team</div></div>
+        </div>
+      </div>
+      <div class="story-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="story-step">
+        <div class="story-card">
+          <div class="story-icon" style="background:#8A5A00;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>
+          </div>
+          <div class="story-num">STEP 6</div>
+          <div class="story-title">Follow-up runs itself</div>
+          <div class="story-copy">No answer? A workflow retries later — automatically.</div>
+          <div class="story-chip"><div class="sc-top">Retry <span class="pill warm">2h</span></div><div class="sc-sub">No-answer rule</div></div>
+        </div>
+      </div>
+      <div class="story-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="story-step">
+        <div class="story-card">
+          <div class="story-icon" style="background:#1F5FBF;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="17" rx="1"/></svg>
+          </div>
+          <div class="story-num">STEP 7</div>
+          <div class="story-title">It shows up on your dashboard</div>
+          <div class="story-copy">Outcome, transcript, and pipeline — updated in real time.</div>
+          <div class="story-chip"><div class="sc-top">Answered <span class="pill good">92%</span></div><div class="sc-sub">Today, 1,284 calls</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="narrative reveal">
+      <p class="eyebrow">In plain terms</p>
+      <p style="margin-top:8px;">Ben fills out a form on your website and becomes a <b>Lead</b>. Within minutes, <b>Aria</b> — your sales agent — calls him. If he doesn't pick up, a <b>Workflow</b> automatically tries again in two hours, no one has to remember to. If Ben's ready to move forward, Aria books the appointment straight into your calendar during the call — no back-and-forth emails, no double-booking. If instead it's urgent, or Ben simply asks for a real person, Aria hands the call off to your team immediately, mid-call, so nothing important is ever left to a bot alone. The moment the call ends, the transcript, recording, and outcome are saved, Ben's spot in your pipeline updates itself, and it all rolls up onto your <b>Dashboard</b> — so by the end of the day you know exactly how many leads were reached, how many appointments were booked, and how many needed a human, without pulling a report together by hand.</p>
+    </div>
+  </section>
+
+  <!-- PAGE 3 -->
+  <section class="page" data-label="Agents &amp; Conversations">
+    <div class="section-head reveal"><span class="section-num">03 / 09</span></div>
+    <h2 class="page-title">Agents &amp; conversations</h2>
+    <p class="page-intro">Everything starts with an AI Agent — a configurable voice that represents your business. Give it a personality, a script, and a phone number, and it's ready to talk.</p>
+
+    <div class="feature reveal">
+      <div class="feature-head">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.6 2.9-6 5.5-6s5.5 2.4 5.5 6"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2c2.2.3 4 2.2 4.5 5.3"/></svg></div>
+        <div class="feature-body">
+          <div><h3 class="feature-title">AI Agents</h3><p class="feature-copy">Build as many agents as you need — one for sales, one for support, one for booking appointments. Each has its own voice, personality, and rules for what it should and shouldn't do.</p></div>
+          <span class="feature-tag">Configurable</span>
+        </div>
+      </div>
+      <div class="frame">
+        <div class="frame-bar"><div class="fb-path"><span class="fb-dot"></span>voiceagent.app / agents</div></div>
+        <div class="frame-body">
+          <div class="agent-grid">
+            <div class="agent-card">
+              <div class="agent-top"><div class="agent-avatar" style="background:linear-gradient(135deg,var(--accent),var(--accent-2));">A</div><div><div class="agent-name">Aria</div><div class="agent-role">Sales agent</div></div></div>
+              <div class="agent-desc">Qualifies inbound interest and books a callback.</div>
+              <div class="agent-actions"><span class="mini-btn primary">Call</span><span class="mini-btn">Edit</span><span class="pill good" style="margin-left:auto;"><span class="dot"></span>Active</span></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-top"><div class="agent-avatar" style="background:#1F5FBF;">M</div><div><div class="agent-name">Miles</div><div class="agent-role">Support agent</div></div></div>
+              <div class="agent-desc">Answers account questions, escalates to a human when needed.</div>
+              <div class="agent-actions"><span class="mini-btn primary">Call</span><span class="mini-btn">Edit</span><span class="pill good" style="margin-left:auto;"><span class="dot"></span>Active</span></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-top"><div class="agent-avatar" style="background:#B5460B;">P</div><div><div class="agent-name">Priya</div><div class="agent-role">Appointment setter</div></div></div>
+              <div class="agent-desc">Confirms bookings and sends reminders.</div>
+              <div class="agent-actions"><span class="mini-btn primary">Call</span><span class="mini-btn">Edit</span><span class="pill muted" style="margin-left:auto;"><span class="dot"></span>Paused</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="feature-head">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.4 21 3 13.6 3 4.6c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8Z"/></svg></div>
+        <div class="feature-body">
+          <div><h3 class="feature-title">Calls, live &amp; recorded</h3><p class="feature-copy">Every call is transcribed in real time. Watch a conversation as it happens, or come back later to read, search, or listen to the recording. Mid-call, the agent can book an appointment straight into your calendar — and if something's urgent or the caller asks for a person, it hands off smoothly instead of leaving them stuck.</p></div>
+          <span class="feature-tag">Real-time</span>
+        </div>
+      </div>
+      <div class="frame">
+        <div class="frame-bar"><div class="fb-path"><span class="fb-dot"></span>voiceagent.app / calls</div></div>
+        <div class="frame-body">
+          <div class="calls-split">
+            <div class="calls-list">
+              <div class="call-row active"><div class="call-row-top"><span>Riya Sharma</span><span class="pill good"><span class="dot"></span>Live</span></div><div class="call-row-sub">Inbound · 02:41</div></div>
+              <div class="call-row"><div class="call-row-top"><span>David Chen</span><span class="pill muted">Completed</span></div><div class="call-row-sub">Outbound · 03:12</div></div>
+              <div class="call-row"><div class="call-row-top"><span>Amara Okafor</span><span class="pill warm">No answer</span></div><div class="call-row-sub">Outbound · Retry in 2h</div></div>
+            </div>
+            <div class="transcript">
+              <div class="bubble agent">Hi, thanks for calling — I can help you get set up. What's your business called?</div>
+              <div class="bubble caller">It's called Northgate Dental, we're looking at your scheduling plan.</div>
+              <div class="bubble agent">Great choice — I can walk you through pricing now, or book you in with our team. Which would you prefer?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 4 -->
+  <section class="page" data-label="Scale &amp; Pipeline">
+    <div class="section-head reveal"><span class="section-num">04 / 09</span></div>
+    <h2 class="page-title">Reaching people at scale</h2>
+    <p class="page-intro">Once an agent is ready, VoiceAgent handles the volume — dialing lists, tracking the pipeline, and following up — without anyone manually working through a spreadsheet.</p>
+
+    <div class="feature reveal">
+      <div class="feature-head">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 20 4 13 20l-2.5-6.5L4 12Z"/></svg></div>
+        <div class="feature-body">
+          <div><h3 class="feature-title">Campaigns</h3><p class="feature-copy">Upload a list, set the pace, and let VoiceAgent work through it in the background — retrying no-answers automatically and respecting the calling hours you set.</p></div>
+          <span class="feature-tag">Bulk outreach</span>
+        </div>
+      </div>
+      <div class="frame">
+        <div class="frame-bar"><div class="fb-path"><span class="fb-dot"></span>voiceagent.app / campaigns</div></div>
+        <div class="frame-body">
+          <div class="campaign-grid">
+            <div class="campaign-card">
+              <div class="campaign-top"><span>Spring Renewals</span><span class="pill good"><span class="dot"></span>Running</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:64%"></div></div>
+              <div class="stat-row"><div><b>640</b>Contacted</div><div><b>512</b>Done</div><div><b>38</b>Failed</div><div><b>1,000</b>Total</div></div>
+            </div>
+            <div class="campaign-card">
+              <div class="campaign-top"><span>New Leads — Q3</span><span class="pill muted">Scheduled</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
+              <div class="stat-row"><div><b>0</b>Contacted</div><div><b>0</b>Done</div><div><b>0</b>Failed</div><div><b>420</b>Total</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="feature-head">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="5" height="16" rx="1.2"/><rect x="10.5" y="4" width="5" height="10" rx="1.2"/><rect x="17" y="4" width="4" height="7" rx="1.2"/></svg></div>
+        <div class="feature-body">
+          <div><h3 class="feature-title">Leads &amp; contacts</h3><p class="feature-copy">Every conversation updates your pipeline on its own — no re-typing notes after a call. Track deals from first contact through to won, in a simple board view.</p></div>
+          <span class="feature-tag">Sales pipeline</span>
+        </div>
+      </div>
+      <div class="frame">
+        <div class="frame-bar"><div class="fb-path"><span class="fb-dot"></span>voiceagent.app / leads</div></div>
+        <div class="frame-body">
+          <div class="kanban">
+            <div><div class="kanban-col-head"><span>New</span><span>4</span></div>
+              <div class="kanban-card"><div class="kname">Ben Torres</div><div class="kval">$1,200</div></div>
+              <div class="kanban-card"><div class="kname">Lena Ruiz</div><div class="kval">$800</div></div>
+            </div>
+            <div><div class="kanban-col-head"><span>Contacted</span><span>3</span></div>
+              <div class="kanban-card"><div class="kname">David Chen</div><div class="kval">$2,400</div></div>
+            </div>
+            <div><div class="kanban-col-head"><span>Proposal</span><span>2</span></div>
+              <div class="kanban-card"><div class="kname">Northgate Dental</div><div class="kval">$6,000</div></div>
+            </div>
+            <div><div class="kanban-col-head"><span>Won</span><span>6</span></div>
+              <div class="kanban-card"><div class="kname">Amara Okafor</div><div class="kval">$3,150</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="feature-head">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6.8 7.2 11 16.4M17.2 7.2 13 16.4"/></svg></div>
+        <div class="feature-body">
+          <div><h3 class="feature-title">Workflows</h3><p class="feature-copy">Set up simple rules once, and let them run forever: "if a call ends with no answer, try again in two hours" or "when a new lead comes in, call them within five minutes."</p></div>
+          <span class="feature-tag">Automation</span>
+        </div>
+      </div>
+      <div class="frame">
+        <div class="frame-bar"><div class="fb-path"><span class="fb-dot"></span>voiceagent.app / workflows</div></div>
+        <div class="frame-body">
+          <div class="flow-chain">
+            <div class="flow-node"><div class="fn-icon" style="background:#8A5A00;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></div><div><div class="fn-type">Trigger</div><div class="fn-label">Call ends — no answer</div></div></div>
+            <div class="flow-connector"></div>
+            <div class="flow-node"><div class="fn-icon" style="background:#4A4C5A;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><div class="fn-type">Wait</div><div class="fn-label">2 hours</div></div></div>
+            <div class="flow-connector"></div>
+            <div class="flow-node"><div class="fn-icon" style="background:#B5460B;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.4 21 3 13.6 3 4.6c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8Z"/></svg></div><div><div class="fn-type">Call</div><div class="fn-label">Retry with Aria</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 5 -->
+  <section class="page" data-label="Smarter Every Call">
+    <div class="section-head reveal"><span class="section-num">05 / 09</span></div>
+    <h2 class="page-title">Smarter every call</h2>
+    <p class="page-intro">Two things make an AI agent feel less like a machine and more like your best team member: knowing the right answers, and sounding right saying them.</p>
+
+    <div class="feature reveal">
+      <div class="feature-head">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v18H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H12v18h5.5a2.5 2.5 0 0 0 2.5-2.5v-13Z"/></svg></div>
+        <div class="feature-body">
+          <div><h3 class="feature-title">Knowledge base</h3><p class="feature-copy">Upload your pricing sheets, FAQs, and policies. Your agent reads them and uses them to answer questions accurately — instead of guessing or making something up.</p></div>
+          <span class="feature-tag">Accurate answers</span>
+        </div>
+      </div>
+      <div class="frame">
+        <div class="frame-bar"><div class="fb-path"><span class="fb-dot"></span>voiceagent.app / knowledge-base</div></div>
+        <div class="frame-body">
+          <div class="kb-list">
+            <div class="kb-row"><div class="kb-name"><span class="kb-icon">PDF</span>Pricing Guide 2026</div><span class="pill good"><span class="dot"></span>Ready</span></div>
+            <div class="kb-row"><div class="kb-name"><span class="kb-icon">DOC</span>Service Policies</div><span class="pill good"><span class="dot"></span>Ready</span></div>
+            <div class="kb-row"><div class="kb-name"><span class="kb-icon">TXT</span>Frequently Asked Questions</div><span class="pill warm">Processing</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="feature-head">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path d="M9 21h6"/></svg></div>
+        <div class="feature-body">
+          <div><h3 class="feature-title">Voices</h3><p class="feature-copy">Choose from a wide range of natural-sounding voices, or match one to each agent's role — warm and reassuring for support, confident and upbeat for sales.</p></div>
+          <span class="feature-tag">Natural sound</span>
+        </div>
+      </div>
+      <div class="frame">
+        <div class="frame-bar"><div class="fb-path"><span class="fb-dot"></span>voiceagent.app / voices</div></div>
+        <div class="frame-body">
+          <div class="voice-list">
+            <div class="voice-row selected">
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+              <div><div class="voice-name">Aria</div><div class="voice-meta">Warm, professional — female</div></div>
+              <div class="voice-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg></div>
+            </div>
+            <div class="voice-row">
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+              <div><div class="voice-name">Miles</div><div class="voice-meta">Confident, friendly — male</div></div>
+            </div>
+            <div class="voice-row">
+              <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+              <div><div class="voice-name">Priya</div><div class="voice-meta">Clear, warm — female, Hindi accent</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 6 -->
+  <section class="page" data-label="Insights &amp; Analytics">
+    <div class="section-head reveal"><span class="section-num">06 / 09</span></div>
+    <h2 class="page-title">Insights &amp; analytics</h2>
+    <p class="page-intro">Every call feeds a live dashboard — so you always know what's working, without pulling a report together by hand.</p>
+
+    <div class="feature reveal" style="margin-top:44px;">
+      <div class="frame" style="margin-left:0;">
+        <div class="frame-bar"><div class="fb-path"><span class="fb-dot"></span>voiceagent.app / dashboard</div></div>
+        <div class="frame-body">
+          <div class="kpi-row">
+            <div class="kpi-tile"><div class="kpi-top"><div class="kpi-num">1,284</div><span class="kpi-trend">+12%</span></div><div class="kpi-label">Calls today</div></div>
+            <div class="kpi-tile"><div class="kpi-top"><div class="kpi-num">92%</div><span class="kpi-trend">+3%</span></div><div class="kpi-label">Answered</div></div>
+            <div class="kpi-tile"><div class="kpi-top"><div class="kpi-num">2m 14s</div><span class="kpi-trend" style="color:var(--muted);background:var(--border);">avg</span></div><div class="kpi-label">Avg. call length</div></div>
+            <div class="kpi-tile"><div class="kpi-top"><div class="kpi-num">3</div><span class="kpi-trend" style="color:var(--muted);background:var(--border);">live</span></div><div class="kpi-label">Active campaigns</div></div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-card">
+              <div class="chart-title">Calls this week</div>
+              <div class="bars">
+                <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:52%"></div>
+                <div class="bar" style="height:80%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:95%"></div><div class="bar" style="height:60%"></div>
+              </div>
+              <div class="bar-labels"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Call outcomes</div>
+              <div class="donut"><div class="donut-hole"><b>92%</b><span>answered</span></div></div>
+              <div class="legend">
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--good);"></span>Answered — 92%</div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--accent);"></span>Voicemail — 4%</div>
+                <div class="legend-item"><span class="legend-swatch" style="background:var(--warm);"></span>No answer — 4%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="pull reveal">"Set it up once, and every new lead gets a phone call within minutes — day or night."</p>
+  </section>
+
+  <!-- PAGE 7 — BUILD TIMELINE -->
+  <section class="page" id="deadlines" data-label="Build Timeline">
+    <div class="section-head reveal"><span class="section-num">07 / 09</span></div>
+    <h2 class="page-title">How long this takes to build</h2>
+    <p class="page-intro">Two honest paths, depending on how the voice pipeline itself gets built. Treat these as planning estimates, not a committed schedule, until scope is confirmed in a kickoff call.</p>
+    <div class="agent-badge reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><circle cx="9" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M12 3v2"/></svg>
+      Agent assistance: <b>Replit's AI coding agent</b>
+    </div>
+
+    <div style="overflow-x:auto;">
+    <table class="dl-table reveal">
+      <thead><tr><th>Section</th><th>Using ElevenLabs' ready-made agent</th><th>Building our own full pipeline</th></tr></thead>
+      <tbody>
+        <tr><td class="phase">Foundations — auth, app shell, infra</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
+        <tr><td class="phase">Agents — configuration &amp; UI</td><td class="num">2 working days</td><td class="num">3 working days</td></tr>
+        <tr><td class="phase">Calls — the real-time voice pipeline</td><td class="num">4–6 working days</td><td class="num">10–13 working days</td></tr>
+        <tr><td class="phase">Campaigns — bulk dialing</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
+        <tr><td class="phase">Leads &amp; contacts (CRM)</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
+        <tr><td class="phase">Workflows — automation</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
+        <tr><td class="phase">Knowledge base &amp; voices</td><td class="num">2–3 working days</td><td class="num">4 working days</td></tr>
+        <tr><td class="phase">Dashboard, notifications &amp; settings</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
+        <tr><td class="phase">Integration, load-testing &amp; launch</td><td class="num">3 working days</td><td class="num">5 working days</td></tr>
+        <tr class="total"><td class="phase">Estimated total</td><td class="num">≈ 26–29 working days<br>(≈ 5–6 working weeks)</td><td class="num">≈ 37–40 working days<br>(≈ 8 working weeks)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="table-note">Working days = Monday–Friday only. Weekends aren't counted, so the working-week total won't match a plain calendar-week count.</p>
+
+    <p class="page-intro" style="margin-top:28px;">Replit's agent compresses every section, since most of it is scaffolding — CRUD screens, API routes, data models — that it can generate directly from the detailed specs we've already written. It compresses the real-time voice pipeline less: that section still needs live testing, latency tuning, and debugging timing issues across the AI providers involved, which is review work, not typing work. With ElevenLabs' ready-made agent, the speech recognition, voice synthesis, and turn-taking are already built and hosted for us — even the agent has less to wire up there. Building it ourselves means directing the agent through that entire real-time pipeline, still this project's single most complex piece of work even with AI-assisted development.</p>
+
+    <div class="note-box reveal">
+      <b>The trade-off isn't only speed.</b> The ready-made path launches faster, but every call then runs on ElevenLabs' pricing and infrastructure indefinitely — see the cost comparison on the next page. Building it ourselves takes a bit longer up front but means we control latency, can swap in cheaper providers later without a rebuild, and aren't dependent on one vendor's roadmap, rate changes, or uptime.
+    </div>
+  </section>
+
+  <!-- PAGE 8 — COST ESTIMATE -->
+  <section class="page" id="costing" data-label="Cost Estimate">
+    <div class="section-head reveal"><span class="section-num">08 / 09</span></div>
+    <h2 class="page-title">What it costs to actually run</h2>
+    <p class="page-intro">Same comparison, from the running-cost side: buying a ready-made voice agent vs. paying each provider directly for a fully custom-built pipeline. Worked out for a sample month of <b>1,000 calls averaging 5 minutes each — 5,000 minutes total.</b> Every stack below includes call recording, since every call is recorded and searchable by design (see page 3).</p>
+
+    <h3 style="margin-top:44px; font-size:1.1rem;" class="reveal">Option A — Buy a ready-made voice agent</h3>
+    <div class="cost-grid reveal">
+      <div class="cost-card">
+        <h4>ElevenLabs Conversational AI</h4>
+        <div class="cc-sub">Their agent handles speech recognition, turn-taking &amp; voice — bundled</div>
+        <div class="cost-line"><span class="cl-label">Platform (STT + TTS + orchestration)</span><span class="cl-val">$0.080/min</span></div>
+        <div class="cost-line"><span class="cl-label">LLM (OpenAI, billed separately)</span><span class="cl-val">$0.001/min</span></div>
+        <div class="cost-line"><span class="cl-label">Telephony + recording (Twilio)</span><span class="cl-val">$0.0165/min</span></div>
+        <div class="cost-total-row"><span class="ct-label">Per minute</span><span class="ct-val">$0.098</span></div>
+        <div class="scale-table">
+          <div class="scale-head">Total cost at scale</div>
+          <div class="scale-row"><span>1,000 minutes</span><span class="sv">$98</span></div>
+          <div class="scale-row base"><span>5,000 minutes (1,000 calls)</span><span class="sv">$490</span></div>
+          <div class="scale-row"><span>10,000 minutes</span><span class="sv">$980</span></div>
+          <div class="scale-row"><span>50,000 minutes</span><span class="sv">$4,900</span></div>
+        </div>
+      </div>
+      <div class="cost-card">
+        <h4>Cartesia Line</h4>
+        <div class="cc-sub">Their bundled Voice Agents (Line) product — call duration is flat across every plan tier</div>
+        <div class="cost-line"><span class="cl-label">Call duration (Line — STT + TTS + orchestration)</span><span class="cl-val">$0.060/min</span></div>
+        <div class="cost-line"><span class="cl-label">Telephony (Cartesia-provided phone number)</span><span class="cl-val">$0.014/min</span></div>
+        <div class="cost-line"><span class="cl-label">LLM usage (currently free for UI-built agents — promotional; modeled here at steady-state cost)</span><span class="cl-val">$0.001/min</span></div>
+        <div class="cost-line"><span class="cl-label">Recording (not listed by Cartesia; estimated at Twilio's rate)</span><span class="cl-val">$0.0025/min</span></div>
+        <div class="cost-total-row"><span class="ct-label">Per minute</span><span class="ct-val">$0.0775</span></div>
+        <div class="scale-table">
+          <div class="scale-head">Total cost at scale</div>
+          <div class="scale-row"><span>1,000 minutes</span><span class="sv">$78</span></div>
+          <div class="scale-row base"><span>5,000 minutes (1,000 calls)</span><span class="sv">$388</span></div>
+          <div class="scale-row"><span>10,000 minutes</span><span class="sv">$775</span></div>
+          <div class="scale-row"><span>50,000 minutes</span><span class="sv">$3,875</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px; font-size:1.1rem;" class="reveal">Option B — Build the full pipeline ourselves</h3>
+    <p class="page-intro" style="margin-top:10px; font-size:0.92rem;">Same stack either way — Deepgram (STT) &rarr; OpenAI (LLM) &rarr; Twilio (telephony) — just the voice engine differs. Both are realistic choices; the numbers below help decide.</p>
+    <div class="cost-grid reveal">
+      <div class="cost-card">
+        <h4>Voice: ElevenLabs (TTS)</h4>
+        <div class="cc-sub">Deepgram &rarr; OpenAI &rarr; ElevenLabs &rarr; Twilio</div>
+        <div class="cost-line"><span class="cl-label">Speech-to-text (Deepgram Nova-3, streaming)</span><span class="cl-val">$0.0077/min</span></div>
+        <div class="cost-line"><span class="cl-label">LLM (OpenAI GPT-4o-mini)</span><span class="cl-val">$0.001/min</span></div>
+        <div class="cost-line"><span class="cl-label">Text-to-speech (ElevenLabs, low-latency model)</span><span class="cl-val">$0.025/min</span></div>
+        <div class="cost-line"><span class="cl-label">Telephony (Twilio voice)</span><span class="cl-val">$0.014/min</span></div>
+        <div class="cost-line"><span class="cl-label">Recording (Twilio — always on)</span><span class="cl-val">$0.0025/min</span></div>
+        <div class="cost-line"><span class="cl-label">Real-time audio streaming (Twilio Media Streams)</span><span class="cl-val">$0.004/min</span></div>
+        <div class="cost-total-row"><span class="ct-label">Per minute</span><span class="ct-val">$0.0542</span></div>
+        <div class="scale-table">
+          <div class="scale-head">Total cost at scale</div>
+          <div class="scale-row"><span>1,000 minutes</span><span class="sv">$54</span></div>
+          <div class="scale-row base"><span>5,000 minutes (1,000 calls)</span><span class="sv">$271</span></div>
+          <div class="scale-row"><span>10,000 minutes</span><span class="sv">$542</span></div>
+          <div class="scale-row"><span>50,000 minutes</span><span class="sv">$2,710</span></div>
+        </div>
+      </div>
+      <div class="cost-card">
+        <h4>Voice: Cartesia (Sonic TTS)</h4>
+        <div class="cc-sub">Deepgram &rarr; OpenAI &rarr; Cartesia &rarr; Twilio</div>
+        <div class="cost-line"><span class="cl-label">Speech-to-text (Deepgram Nova-3, streaming)</span><span class="cl-val">$0.0077/min</span></div>
+        <div class="cost-line"><span class="cl-label">LLM (OpenAI GPT-4o-mini)</span><span class="cl-val">$0.001/min</span></div>
+        <div class="cost-line"><span class="cl-label">Text-to-speech (Cartesia Sonic-3.5 — converted from $0.0294/min of generated audio, ~50% talk-time)</span><span class="cl-val">$0.0147/min</span></div>
+        <div class="cost-line"><span class="cl-label">Telephony (Twilio voice)</span><span class="cl-val">$0.014/min</span></div>
+        <div class="cost-line"><span class="cl-label">Recording (Twilio — always on)</span><span class="cl-val">$0.0025/min</span></div>
+        <div class="cost-line"><span class="cl-label">Real-time audio streaming (Twilio Media Streams)</span><span class="cl-val">$0.004/min</span></div>
+        <div class="cost-total-row"><span class="ct-label">Per minute</span><span class="ct-val">$0.0439</span></div>
+        <div class="scale-table">
+          <div class="scale-head">Total cost at scale</div>
+          <div class="scale-row"><span>1,000 minutes</span><span class="sv">$44</span></div>
+          <div class="scale-row base"><span>5,000 minutes (1,000 calls)</span><span class="sv">$220</span></div>
+          <div class="scale-row"><span>10,000 minutes</span><span class="sv">$439</span></div>
+          <div class="scale-row"><span>50,000 minutes</span><span class="sv">$2,195</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cost-line" style="max-width:660px; margin-top:8px; border-top:1px dashed var(--border); padding-top:14px;"><span class="cl-label">+ S3 storage for the recordings themselves (~5GB per 1,000 calls, either voice engine)</span><span class="cl-val">≈ $0.12 / month</span></div>
+
+    <h3 style="margin-top:44px; font-size:1.1rem;" class="reveal">Side by side, for 1,000 calls at 5 minutes each</h3>
+    <div class="compare-row four reveal">
+      <div class="compare-tile"><div class="ct-name">ElevenLabs agent</div><div class="ct-price">$0.49</div><div class="ct-note">per call &middot; 5 min avg</div></div>
+      <div class="compare-tile"><div class="ct-name">Cartesia agent</div><div class="ct-price">$0.39</div><div class="ct-note">per call &middot; 5 min avg</div></div>
+      <div class="compare-tile"><div class="ct-name">Built — ElevenLabs voice</div><div class="ct-price">$0.27</div><div class="ct-note">per call &middot; 5 min avg</div></div>
+      <div class="compare-tile best"><div class="ct-name">Built — Cartesia voice</div><div class="ct-price">$0.22</div><div class="ct-note">per call &middot; 5 min avg — cheapest</div></div>
+    </div>
+
+    <div class="note-box reveal">
+      <b>These are estimates, not quotes.</b> Rates were checked against each provider's official pricing pages in July 2026 and drift over time — confirm current rates directly with each vendor before finalizing a budget. Cartesia's Voice Agents rate ($0.06/min call duration + $0.014/min telephony) and its standalone Sonic-3.5 TTS rate ($0.0294/min of generated audio, Startup plan) are both taken directly from their published plan comparison table. Converting Sonic's per-generated-audio-minute rate into a per-call-minute figure assumes the agent is actively speaking roughly half of each call — a reasonable estimate, but softer than ElevenLabs' figure, which is priced directly per character with no conversion needed. Figures also assume about 4 LLM exchanges per minute with rolling conversation history and roughly 1MB of recorded audio per call-minute for storage sizing. Recording cost isn't listed on Cartesia's own pricing page for either option, so it's estimated at Twilio's published rate. LLM usage during Cartesia Voice Agents calls is currently free for UI-built agents as a limited-time promotion — modeled here at its steady-state cost instead, since a promotional rate isn't a safe basis for a long-term budget. All figures exclude the one-time engineering cost of building Option B (see the previous page).
+
+      <br><br><b>Why the numbers moved around:</b> Cartesia's ready-made Voice Agents product isn't the cheapest way to use Cartesia — telephony is billed on top of the $0.06/min call rate, not included in it, which pushes it above ElevenLabs' bundled telephony+recording rate on a per-item basis (though still well under ElevenLabs' overall total). The cheapest path in this comparison is building the pipeline ourselves using Cartesia purely as the voice engine: their standalone Sonic TTS, priced per minute of audio actually generated rather than per minute of call time, works out cheaper than paying for their fully-bundled agent product or for ElevenLabs' standalone TTS API.
+    </div>
+  </section>
+
+  <!-- PAGE 9 -->
+  <section class="page" data-label="Why It Matters">
+    <div class="section-head reveal"><span class="section-num">09 / 09</span></div>
+    <h2 class="page-title">Why it matters</h2>
+    <p class="page-intro">VoiceAgent doesn't replace your team — it clears the repetitive work off their plate, so every lead gets a fast, consistent first conversation, whether that's the first call of the day or the four-hundredth.</p>
+
+    <div class="closing-cta reveal">
+      <p class="eyebrow">More conversations, less manual work</p>
+      <h3 style="margin-top:10px;">Ready to see it live?</h3>
+      <p>The fastest way to understand VoiceAgent is to watch it take a real call. Let's set up a short walkthrough with your own use case.</p>
+      <div class="benefit-list">
+        <div class="benefit"><b>24 / 7</b><span>Coverage, including outside office hours</span></div>
+        <div class="benefit"><b>0</b><span>Leads left to follow up manually</span></div>
+        <div class="benefit"><b>100%</b><span>Of calls transcribed &amp; searchable</span></div>
+      </div>
+      <!-- TODO: point this at your real booking link / mailto before sending -->
+      <a class="cta-btn" href="#">Schedule a walkthrough <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </section>
+
+  <div class="page-foot">
+    <span>VoiceAgent — Platform Overview</span>
+  </div>
+
+</div>
+
+<script>
+  (function(){
+    var rail = document.getElementById('rail');
+    function onScroll(){
+      var h = document.documentElement;
+      var scrollTop = h.scrollTop || document.body.scrollTop;
+      var height = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+      var pct = height > 0 ? (scrollTop / height) * 100 : 0;
+      rail.style.width = pct + '%';
+    }
+    document.addEventListener('scroll', onScroll, { passive:true });
+    onScroll();
+
+    var sections = Array.prototype.slice.call(document.querySelectorAll('.page[data-label]'));
+    var label = document.getElementById('section-label');
+    if('IntersectionObserver' in window && sections.length){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ label.textContent = e.target.getAttribute('data-label'); }
+        });
+      }, { rootMargin: '-45% 0px -45% 0px' });
+      sections.forEach(function(s){ io.observe(s); });
+    }
+
+    var reveals = document.querySelectorAll('.reveal');
+    if('IntersectionObserver' in window){
+      var ro = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ e.target.classList.add('visible'); ro.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      reveals.forEach(function(r){ ro.observe(r); });
+    } else {
+      reveals.forEach(function(r){ r.classList.add('visible'); });
+    }
+
+    var pdfBtn = document.getElementById('pdf-btn');
+    if(pdfBtn){ pdfBtn.addEventListener('click', function(){ window.print(); }); }
+  })();
+</script>
+</body>
+</html>
