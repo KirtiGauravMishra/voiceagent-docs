@@ -310,25 +310,6 @@
   .cta-btn:hover{ filter:brightness(1.08); }
   .cta-btn svg{ width:16px; height:16px; }
 
-  /* ---- Build timeline table ---- */
-  .dl-table{ width:100%; border-collapse:collapse; margin-top:32px; font-size:0.87rem; }
-  .dl-table th{ text-align:left; padding:11px 14px; border-bottom:2px solid var(--border-strong); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:700; }
-  .dl-table td{ padding:13px 14px; border-bottom:1px solid var(--border); }
-  .dl-table tr:last-child td{ border-bottom:none; }
-  .dl-table td.phase{ font-weight:600; }
-  .dl-table td.num{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink-soft); }
-  .dl-table tr.total td{ font-weight:800; color:var(--ink); border-top:2px solid var(--border-strong); padding-top:16px; }
-  .dl-table tr.total td.num{ color:var(--accent-ink); font-size:1.02rem; }
-
-  .agent-badge{
-    display:inline-flex; align-items:center; gap:9px; margin-top:18px; padding:10px 18px; border-radius:100px;
-    background:linear-gradient(135deg,var(--accent-soft),var(--good-soft)); border:1px solid var(--accent);
-    font-size:0.85rem; font-weight:700; color:var(--ink);
-  }
-  .agent-badge svg{ width:17px; height:17px; color:var(--accent-ink); flex:0 0 auto; }
-  .agent-badge b{ color:var(--accent-ink); }
-  .table-note{ font-size:0.75rem; color:var(--muted); margin-top:10px; font-style:italic; }
-
   /* ---- Cost comparison cards ---- */
   .cost-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:24px; }
   .cost-card{ border:1px solid var(--border); background:var(--surface); border-radius:14px; padding:24px 26px; box-shadow:var(--shadow-sm); }
@@ -365,7 +346,6 @@
   @media (max-width:720px){
     .cost-grid{ grid-template-columns:1fr; }
     .compare-row, .compare-row.four{ grid-template-columns:1fr; }
-    .dl-table{ font-size:0.78rem; }
   }
   @media print{
     .cost-grid, .compare-row{ grid-template-columns:1fr 1fr; }
@@ -416,7 +396,6 @@
   <div class="topbar-right">
     <div class="section-label" id="section-label">Platform Overview</div>
     <div class="topbar-nav">
-      <a href="#deadlines">Timeline</a>
       <a href="#costing">Costing</a>
     </div>
     <button id="pdf-btn" type="button" title="Opens your browser's print dialog — choose &quot;Save as PDF&quot; as the destination">
@@ -464,16 +443,15 @@
         <div class="toc-item"><span>Scale &amp; pipeline</span><span class="num">04</span></div>
         <div class="toc-item"><span>Smarter every call</span><span class="num">05</span></div>
         <div class="toc-item"><span>Insights &amp; analytics</span><span class="num">06</span></div>
-        <div class="toc-item"><span>Build timeline</span><span class="num">07</span></div>
-        <div class="toc-item"><span>Cost estimate</span><span class="num">08</span></div>
-        <div class="toc-item"><span>Why it matters</span><span class="num">09</span></div>
+        <div class="toc-item"><span>Cost estimate</span><span class="num">07</span></div>
+        <div class="toc-item"><span>Why it matters</span><span class="num">08</span></div>
       </div>
     </div>
   </section>
 
   <!-- PAGE 2 — HOW IT WORKS (full flow) -->
   <section class="page" data-label="How It Works">
-    <div class="section-head reveal"><span class="section-num">02 / 09</span></div>
+    <div class="section-head reveal"><span class="section-num">02 / 08</span></div>
     <h2 class="page-title">From new lead to closed deal — one continuous flow</h2>
     <p class="page-intro">Nothing here needs to be operated by hand. Once it's set up, a lead can arrive, get called, get logged, get followed up with, and show up on your dashboard — without anyone touching a keyboard.</p>
 
@@ -571,7 +549,7 @@
 
   <!-- PAGE 3 -->
   <section class="page" data-label="Agents &amp; Conversations">
-    <div class="section-head reveal"><span class="section-num">03 / 09</span></div>
+    <div class="section-head reveal"><span class="section-num">03 / 08</span></div>
     <h2 class="page-title">Agents &amp; conversations</h2>
     <p class="page-intro">Everything starts with an AI Agent — a configurable voice that represents your business. Give it a personality, a script, and a phone number, and it's ready to talk.</p>
 
@@ -637,7 +615,7 @@
 
   <!-- PAGE 4 -->
   <section class="page" data-label="Scale &amp; Pipeline">
-    <div class="section-head reveal"><span class="section-num">04 / 09</span></div>
+    <div class="section-head reveal"><span class="section-num">04 / 08</span></div>
     <h2 class="page-title">Reaching people at scale</h2>
     <p class="page-intro">Once an agent is ready, VoiceAgent handles the volume — dialing lists, tracking the pipeline, and following up — without anyone manually working through a spreadsheet.</p>
 
@@ -723,7 +701,7 @@
 
   <!-- PAGE 5 -->
   <section class="page" data-label="Smarter Every Call">
-    <div class="section-head reveal"><span class="section-num">05 / 09</span></div>
+    <div class="section-head reveal"><span class="section-num">05 / 08</span></div>
     <h2 class="page-title">Smarter every call</h2>
     <p class="page-intro">Two things make an AI agent feel less like a machine and more like your best team member: knowing the right answers, and sounding right saying them.</p>
 
@@ -780,7 +758,7 @@
 
   <!-- PAGE 6 -->
   <section class="page" data-label="Insights &amp; Analytics">
-    <div class="section-head reveal"><span class="section-num">06 / 09</span></div>
+    <div class="section-head reveal"><span class="section-num">06 / 08</span></div>
     <h2 class="page-title">Insights &amp; analytics</h2>
     <p class="page-intro">Every call feeds a live dashboard — so you always know what's working, without pulling a report together by hand.</p>
 
@@ -820,45 +798,9 @@
     <p class="pull reveal">"Set it up once, and every new lead gets a phone call within minutes — day or night."</p>
   </section>
 
-  <!-- PAGE 7 — BUILD TIMELINE -->
-  <section class="page" id="deadlines" data-label="Build Timeline">
-    <div class="section-head reveal"><span class="section-num">07 / 09</span></div>
-    <h2 class="page-title">How long this takes to build</h2>
-    <p class="page-intro">Two honest paths, depending on how the voice pipeline itself gets built. Treat these as planning estimates, not a committed schedule, until scope is confirmed in a kickoff call.</p>
-    <div class="agent-badge reveal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><circle cx="9" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M12 3v2"/></svg>
-      Agent assistance: <b>Replit's AI coding agent</b>
-    </div>
-
-    <div style="overflow-x:auto;">
-    <table class="dl-table reveal">
-      <thead><tr><th>Section</th><th>Using ElevenLabs' ready-made agent</th><th>Building our own full pipeline</th></tr></thead>
-      <tbody>
-        <tr><td class="phase">Foundations — auth, app shell, infra</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
-        <tr><td class="phase">Agents — configuration &amp; UI</td><td class="num">2 working days</td><td class="num">3 working days</td></tr>
-        <tr><td class="phase">Calls — the real-time voice pipeline</td><td class="num">4–6 working days</td><td class="num">10–13 working days</td></tr>
-        <tr><td class="phase">Campaigns — bulk dialing</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
-        <tr><td class="phase">Leads &amp; contacts (CRM)</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
-        <tr><td class="phase">Workflows — automation</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
-        <tr><td class="phase">Knowledge base &amp; voices</td><td class="num">2–3 working days</td><td class="num">4 working days</td></tr>
-        <tr><td class="phase">Dashboard, notifications &amp; settings</td><td class="num">3 working days</td><td class="num">3 working days</td></tr>
-        <tr><td class="phase">Integration, load-testing &amp; launch</td><td class="num">3 working days</td><td class="num">5 working days</td></tr>
-        <tr class="total"><td class="phase">Estimated total</td><td class="num">≈ 26–29 working days<br>(≈ 5–6 working weeks)</td><td class="num">≈ 37–40 working days<br>(≈ 8 working weeks)</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <p class="table-note">Working days = Monday–Friday only. Weekends aren't counted, so the working-week total won't match a plain calendar-week count.</p>
-
-    <p class="page-intro" style="margin-top:28px;">Replit's agent compresses every section, since most of it is scaffolding — CRUD screens, API routes, data models — that it can generate directly from the detailed specs we've already written. It compresses the real-time voice pipeline less: that section still needs live testing, latency tuning, and debugging timing issues across the AI providers involved, which is review work, not typing work. With ElevenLabs' ready-made agent, the speech recognition, voice synthesis, and turn-taking are already built and hosted for us — even the agent has less to wire up there. Building it ourselves means directing the agent through that entire real-time pipeline, still this project's single most complex piece of work even with AI-assisted development.</p>
-
-    <div class="note-box reveal">
-      <b>The trade-off isn't only speed.</b> The ready-made path launches faster, but every call then runs on ElevenLabs' pricing and infrastructure indefinitely — see the cost comparison on the next page. Building it ourselves takes a bit longer up front but means we control latency, can swap in cheaper providers later without a rebuild, and aren't dependent on one vendor's roadmap, rate changes, or uptime.
-    </div>
-  </section>
-
-  <!-- PAGE 8 — COST ESTIMATE -->
+  <!-- PAGE 7 — COST ESTIMATE -->
   <section class="page" id="costing" data-label="Cost Estimate">
-    <div class="section-head reveal"><span class="section-num">08 / 09</span></div>
+    <div class="section-head reveal"><span class="section-num">07 / 08</span></div>
     <h2 class="page-title">What it costs to actually run</h2>
     <p class="page-intro">Same comparison, from the running-cost side: buying a ready-made voice agent vs. paying each provider directly for a fully custom-built pipeline. Worked out for a sample month of <b>1,000 calls averaging 5 minutes each — 5,000 minutes total.</b> Every stack below includes call recording, since every call is recorded and searchable by design (see page 3).</p>
 
@@ -948,15 +890,15 @@
     </div>
 
     <div class="note-box reveal">
-      <b>These are estimates, not quotes.</b> Rates were checked against each provider's official pricing pages in July 2026 and drift over time — confirm current rates directly with each vendor before finalizing a budget. Cartesia's Voice Agents rate ($0.06/min call duration + $0.014/min telephony) and its standalone Sonic-3.5 TTS rate ($0.0294/min of generated audio, Startup plan) are both taken directly from their published plan comparison table. Converting Sonic's per-generated-audio-minute rate into a per-call-minute figure assumes the agent is actively speaking roughly half of each call — a reasonable estimate, but softer than ElevenLabs' figure, which is priced directly per character with no conversion needed. Figures also assume about 4 LLM exchanges per minute with rolling conversation history and roughly 1MB of recorded audio per call-minute for storage sizing. Recording cost isn't listed on Cartesia's own pricing page for either option, so it's estimated at Twilio's published rate. LLM usage during Cartesia Voice Agents calls is currently free for UI-built agents as a limited-time promotion — modeled here at its steady-state cost instead, since a promotional rate isn't a safe basis for a long-term budget. All figures exclude the one-time engineering cost of building Option B (see the previous page).
+      <b>These are estimates, not quotes.</b> Rates were checked against each provider's official pricing pages in July 2026 and drift over time — confirm current rates directly with each vendor before finalizing a budget. Cartesia's Voice Agents rate ($0.06/min call duration + $0.014/min telephony) and its standalone Sonic-3.5 TTS rate ($0.0294/min of generated audio, Startup plan) are both taken directly from their published plan comparison table. Converting Sonic's per-generated-audio-minute rate into a per-call-minute figure assumes the agent is actively speaking roughly half of each call — a reasonable estimate, but softer than ElevenLabs' figure, which is priced directly per character with no conversion needed. Figures also assume about 4 LLM exchanges per minute with rolling conversation history and roughly 1MB of recorded audio per call-minute for storage sizing. Recording cost isn't listed on Cartesia's own pricing page for either option, so it's estimated at Twilio's published rate. LLM usage during Cartesia Voice Agents calls is currently free for UI-built agents as a limited-time promotion — modeled here at its steady-state cost instead, since a promotional rate isn't a safe basis for a long-term budget. All figures exclude the one-time engineering cost of building Option B.
 
       <br><br><b>Why the numbers moved around:</b> Cartesia's ready-made Voice Agents product isn't the cheapest way to use Cartesia — telephony is billed on top of the $0.06/min call rate, not included in it, which pushes it above ElevenLabs' bundled telephony+recording rate on a per-item basis (though still well under ElevenLabs' overall total). The cheapest path in this comparison is building the pipeline ourselves using Cartesia purely as the voice engine: their standalone Sonic TTS, priced per minute of audio actually generated rather than per minute of call time, works out cheaper than paying for their fully-bundled agent product or for ElevenLabs' standalone TTS API.
     </div>
   </section>
 
-  <!-- PAGE 9 -->
+  <!-- PAGE 8 -->
   <section class="page" data-label="Why It Matters">
-    <div class="section-head reveal"><span class="section-num">09 / 09</span></div>
+    <div class="section-head reveal"><span class="section-num">08 / 08</span></div>
     <h2 class="page-title">Why it matters</h2>
     <p class="page-intro">VoiceAgent doesn't replace your team — it clears the repetitive work off their plate, so every lead gets a fast, consistent first conversation, whether that's the first call of the day or the four-hundredth.</p>
 
