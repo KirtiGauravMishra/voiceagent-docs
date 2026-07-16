@@ -19,7 +19,7 @@ Each card: name, active/inactive status dot, description, and a hover action row
   - **Inbound Calls** / **Outbound Calls** — an industry-template picker (a static local JSON data file with categories/templates using `{agent_name}`/`{business_name}`/etc. placeholders, filled in client-side). Outbound mode additionally collects campaign type/product/target-audience/call-goal fields appended to the prompt.
   - On submit: send `{name, systemPrompt, language}` — leave every other field (voice, callSettings, taskSettings) at backend defaults, configured later on the detail page.
 - **`CloneAgentModal`** — fetch the full source agent, copy every configurable field (`systemPrompt`, `description`, `language`, `status`, `llm`, `voice`, `callSettings`, `taskSettings`, `knowledgeDocIds`) into a new create call with a "(Copy)"-suffixed name — a real deep clone.
-- **`DeleteAgentModal`** — require typing the exact agent name to confirm, since deletion is irreversible.
+- **`DeleteAgentModal`** — require typing the exact agent name to confirm, since deletion is irreversible. If the backend rejects the delete because the agent is still assigned to a running campaign, an active workflow, or a phone number's inbound routing (Prompt `backend/02-agents.md`), surface that exact message instead of a generic failure toast — the user needs to know what to unassign first.
 - **`MakeCallModal`** — country-code + phone-number quick-dial form, load the account's phone numbers for an optional "from number" override, dispatch via the calls API (`{agentId, to, direction:'outbound'}`).
 
 Build Share/Clone/Delete/MakeCall as **shared components** (e.g. under `components/agents/`), reused by both `AgentsPage` and `AgentDetailPage` — don't duplicate the same modal in both files.

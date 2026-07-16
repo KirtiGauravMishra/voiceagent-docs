@@ -42,6 +42,14 @@ Add indexes: `{ownerId, status, createdAt:-1}`, `{ownerId, _id}`. `toJSON` trans
 
 Validate `name` (2–100 chars) and `systemPrompt` (10–32000 chars) as required on create; everything else optional with the defaults above, mirrored in both the Mongoose schema and the request-validation schema.
 
+## Deleting an agent
+
+Agents are the most-referenced entity in the system (`Call.agentId`, `Campaign.agentId`, a `Workflow` call-node's `agentId`, `PhoneNumber.inboundAgentId`), so deletion needs the two-part policy from the master guide: block it where it's *active*, allow it where the only references are *historical*.
+
+- Before deleting, check for: any `Campaign` referencing this agent with `status` in `draft|scheduled|running`; any `Workflow` with `status:'active'` containing a call node with this `agentId`; any `PhoneNumber` with `inboundAgentId` set to this agent. If any exist, reject with `409 CONFLICT` and a message naming what's still using it (e.g. `"Cannot delete — still assigned to campaign 'Spring Renewals' and phone number +1..."`) rather than a generic error.
+- Completed/historical campaigns, inactive workflows, and past calls referencing this agent do **not** block deletion — that data stays exactly as it is, because of the denormalized snapshot below.
+- On the `Call` model (Prompt 03), store `agentName` as a denormalized copy of the agent's name **at the time the call was created** — not a live join. This is what keeps a call's detail page showing a sensible agent name after the agent itself is later deleted or renamed, instead of an `undefined`/broken reference.
+
 ## Environment variables
 None specific to this module beyond the global LLM/voice provider keys (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `CARTESIA_API_KEY`, `ELEVENLABS_API_KEY`) and AWS Polly credentials (voice preview only) from the master guide.
 
@@ -50,3 +58,5 @@ None specific to this module beyond the global LLM/voice provider keys (`OPENAI_
 - [ ] `PATCH` with a partial `callSettings` object only changes the given fields, leaving siblings intact.
 - [ ] `test-transfer` places a real Twilio call and bridges to the configured number.
 - [ ] Ownership is enforced on every read/write (a second user's token gets 403, not the agent).
+- [ ] Deleting an agent still assigned to a running campaign, an active workflow, or a phone number's inbound routing is rejected with a message naming what's blocking it.
+- [ ] Deleting an agent with only historical (completed campaign, inactive workflow, past call) references succeeds, and those historical records still display a sensible agent name afterward.

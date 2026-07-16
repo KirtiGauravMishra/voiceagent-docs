@@ -14,8 +14,9 @@ Build these once and **use them everywhere** — the biggest risk on a project t
 
 | Component | Purpose |
 |---|---|
-| `Modal` | Portal-based modal shell, ESC-to-close, sm/md/lg size variants. Every modal in the app (create/edit/delete/clone confirmations across Agents, Campaigns, Leads, etc.) should be built on top of this, not as an independent `createPortal(...)` call per page. |
-| `CustomSelect` | A searchable/portal-positioned dropdown used in place of native `<select>` everywhere (agent config, workflow canvas, voice filters, etc.). |
+| `Modal` | Portal-based modal shell, ESC-to-close, sm/md/lg size variants. Every modal in the app (create/edit/delete/clone confirmations across Agents, Campaigns, Leads, etc.) should be built on top of this, not as an independent `createPortal(...)` call per page. **Trap focus inside the modal while open** (Tab/Shift+Tab cycle only through its own focusable elements), **restore focus to whatever triggered it on close**, and give the modal container `role="dialog"` + `aria-modal="true"`. Get this right once here and every modal in the app inherits it. |
+| `CustomSelect` | A searchable/portal-positioned dropdown used in place of native `<select>` everywhere (agent config, workflow canvas, voice filters, etc.). Must be fully keyboard-operable: open with Enter/Space, navigate options with arrow keys, select with Enter, close with Escape — don't ship a dropdown that only works with a mouse. |
+| `EmptyState` | Icon/illustration + short message + optional call-to-action button, used by every list page when it has zero rows (`components/ui/EmptyState.tsx`). "No agents yet — create your first one" beats a blank table; build this once and have every list page (Agents, Calls, Campaigns, Leads, Contacts, Workflows, Knowledge Base, Voices, Notifications) render it instead of an empty `<table>`. |
 | `Badge` | Status-pill rendering + one shared set of helper functions mapping call/agent/campaign status strings to color variants — the single source of truth for status colors, used by every page that shows a status pill (Calls, Reports, Campaigns, Leads, Workflows). |
 | `AppPagination` | Page-size selector + windowed page-number buttons. Every paginated list in the app (Calls, Campaigns, Reports, Notifications, Leads, Contacts) uses this same component — don't let any page implement its own prev/next pagination inline. |
 | `PageLoader` | Branded full-screen/contained loading spinner, theme-aware even before the theme context mounts (reads the pre-hydration theme signal directly, matching the `index.html` script in §3). Used as the top-level `Suspense` fallback. |
@@ -46,6 +47,7 @@ Fill the gap until React's first paint with a pure-CSS branded loader (e.g. a pu
 - **Dark-mode surface colors**: define these as CSS custom properties consumed directly in your global stylesheet (e.g. `--c-card`, `--c-surface`, `--c-border`, `--c-muted`), not as hardcoded hex utility pairs (`bg-white dark:bg-[#13141e]`) repeated across dozens of components. If you need Tailwind utilities that reference these variables, use Tailwind's native CSS-variable-based theming (v4) or a small custom plugin — don't let the same literal hex value get typed out in component after component.
 - Define a `@layer components` set of reusable classes (`.btn`/`.btn-primary`/`.btn-ghost`/`.btn-danger`/`.btn-outline`, `.card`, `.input`/`.label`/`.field-error`, `.badge*` variants, thin/hidden scrollbar utilities, a few standard keyframe animations) and use these consistently across every page's markup.
 - Pick one font family (e.g. Inter) and set it as the default sans stack.
+- Never remove the default focus outline without replacing it with an equally visible custom one (`:focus-visible` styling) — a component that's keyboard-operable but invisible when focused is not actually accessible.
 
 ## Brand configuration
 
@@ -68,3 +70,6 @@ One `BRAND` config object (name, initials, tagline, domain, company name/address
 - [ ] Toggling dark/light mode shows no flash of the wrong theme on a hard page reload.
 - [ ] The brand name/logo shown in the sidebar and loading screen reflects this org's actual identity, not placeholder branding.
 - [ ] A deliberate TypeScript error in a component fails the production build.
+- [ ] Opening a `Modal` traps Tab navigation inside it, and closing it (Escape, backdrop click, or the close button) returns focus to whatever element opened it.
+- [ ] Every icon-only button in the shared primitives has an `aria-label` and a visible focus ring when tabbed to.
+- [ ] A brand-new account with zero agents/calls/campaigns sees a designed empty state on each of those pages, not a blank table or a raw "No data" string.
